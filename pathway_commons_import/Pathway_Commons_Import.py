@@ -1,11 +1,10 @@
 
 # coding: utf-8
 
-# In[ ]:
-
 import pandas as pd 
 import numpy as np
 from py2neo import Graph, Node, Relationship, authenticate
+
 
 def isGene(potentialGene):
     if "KNOWLEDGEBASE" in str(potentialGene):
@@ -18,22 +17,36 @@ def isGene(potentialGene):
         return True
     else:
         return False
-    
+
+#Reads in Homo_sapiens.txt and creates a dictionary mapping GeneSymbols to their Entrez values
+def createEntrezDict():
+    homo_sapiens = pd.read_csv('./pc_data/Homo_sapiens.txt',sep="\t")
+    dictionary = pd.Series(homo_sapiens.GeneID.values, index=homo_sapiens.Symbol.values).to_dict()
+    return dictionary
+
 
 def createAllGenes(graph,data):
-    uniqueGenes = np.unique(data[["PARTICIPANT_A","PARTICIPANT_B"]])
+    #Create Dictionary that takes gene symbol as input and return entrez value
+    entrezDict = createEntrezDict()
 
+    uniqueGenes = np.unique(data[["PARTICIPANT_A","PARTICIPANT_B"]])
     for i in range(uniqueGenes.size):
-        #Check if value is actually a gene as opposed to a molecule
         
-        currentIsGene = isGene(uniqueGenes[i])
-        query = "MERGE (g:Gene {{symbol:\"{0}\" }} )".format( str(uniqueGenes[i]) )
+        geneName = str(uniqueGenes[i])
+        entrez = ""
         
+        if geneName in entrezDict:
+            entrez = str(entrezDict[geneName])
+            
+        query = "MERGE (g:Gene {{symbol:\"{0}\", entrez:\"{1}\"}} )".format( geneName, entrez)
+        
+        currentIsGene = isGene(geneName)
         if currentIsGene is True:
             print query +"\n"            
             graph.cypher.execute(query)
         else:
-            print str(uniqueGenes[i]) + " is not a gene. Skipping"               
+            print geneName + " is not a gene. Skipping"               
+
 
 def createRelationships(graph,data):
     
@@ -44,9 +57,10 @@ def createRelationships(graph,data):
                 data["INTERACTION_TYPE"][i] == "ProteinReference"):
             print "Row {0} is a molecule interaction. Skipping".format(i)
             continue
-               
+
+
         #Query looks for genes in graph, and creates a unique relationship between them. 
-        query ="Match (ga:Gene {{symbol:\"{0}\", added:'June17' }}),(gb:Gene {{symbol:\"{1}\", added:'June17' }}) CREATE UNIQUE (ga)-[:{2}{{added:'June17',data_source:\"{3}\", pubmed_id:\"{4}\", pathway_names:\"{5}\"}}]->(gb)".format(
+        query ="Match (ga:Gene {{symbol:\"{0}\" }}),(gb:Gene {{symbol:\"{1}\" }}) CREATE UNIQUE (ga)-[:{2} {{source:'Pathway Commons',data_source:\"{3}\", pubmed_id:\"{4}\", pathway_names:\"{5}\"}}]->(gb)".format(
             data["PARTICIPANT_A"][i],
             data["PARTICIPANT_B"][i], 
             data["INTERACTION_TYPE"][i].upper().replace("-","_"),
@@ -62,11 +76,6 @@ def createRelationships(graph,data):
             print "At least one of the participants is not a gene. Skipping row " + str(i)
             continue
 
-
-def getGeneA(row):
-    #Check if this row is a gene or a molecule
-    isGeneVal = isGene(row["PARTICIPANT_A"])
-
 def main():
     print "Starting Main Function"
     data = pd.read_csv('./pc_data/PC.Reactome.EXTENDED_BINARY_SIF.hgnc.csv')
@@ -75,18 +84,10 @@ def main():
     graph = Graph()
 
     createAllGenes(graph,data)
-    #createRelationships(graph,data)
-
-    #for i in range(100):
-        #current_row = data.iloc[i]
-        #print current_row["INTERACTION_TYPE"]
-        #currGene = getGeneA(current_row)
-        #print currGene
+    createRelationships(graph,data)
 
 main()
 
-
-# In[ ]:
 
 
 
