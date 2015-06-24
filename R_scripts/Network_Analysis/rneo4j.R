@@ -1,26 +1,52 @@
 library(RNeo4j)
-
+#library(NetPathMiner)
 neo4j = startGraph("http://localhost:7474/db/data")
 
-nodes_query = "MATCH (g:Gene) RETURN ID(g) as id, g.symbol AS symbol"
-edges_query="MATCH (g1:Gene)-[r]->(g2:Gene) RETURN DISTINCT g1.symbol AS source,TYPE(r) AS relType,g2.symbol AS target"
 
+#Gets all Gene and Drug Nodes from DB
+nodes_query = "
+MATCH n WHERE (n:Drug) or (n:Gene)
+RETURN ID(n) AS id,
+CASE 
+WHEN n:Gene = True
+THEN n.symbol
+WHEN n:Drug = True
+THEN n.name
+End as name,
+labels(n) AS label
+Order by label[0]
+"
+#Returns list of edges between drugs and genes 
+edges_query="MATCH (n:Drug)-[r:TARGETS_GENE]->(m:Gene) RETURN ID(n) AS source, ID(m) AS target"
+
+#Returns number of connections each drug node has
+drug_connection_count = "MATCH (n:Drug)-[r]->(g:Gene) return n AS drug, count(r) AS connection_count"
+
+
+print("Finding Nodes...")
 nodes = cypher(neo4j, nodes_query)
+print("Finding Edges...")
 edges = cypher(neo4j, edges_query)
+
 
 library(igraph)
 #create igraph object
 ig = graph.data.frame(edges, directed=TRUE, nodes)
 
 #Run Girvan-Newman clustering algorithm
+print("Running Girvan Newman betweenness algorithm")
 communities = edge.betweenness.community(ig)
 
+print ("Done calculating communities")
 #Extract cluster assignments and merge with nodes data.frame
 memb = data.frame(name = communities$name, cluster=communities$membership)
 nodes = merge(nodes,memb)
 
 #Reorder columns
-nodes = nodes[c("id", "symbol", "cluster")]
+nodes = nodes[c("id", "name", "label", "cluster")]
+
+#print("New Nodes table with clustering:")
+#print(nodes)
 
 #convert nodes and edges to GraphJSON 
 nodes_json = paste0("\"nodes\":", jsonlite::toJSON(nodes))
@@ -30,7 +56,4 @@ all_json = paste0("{", nodes_json, ",", edges_json, "}")
 sink(file = 'pc.json')
 cat(all_json)
 sink()
-
-
-
 
