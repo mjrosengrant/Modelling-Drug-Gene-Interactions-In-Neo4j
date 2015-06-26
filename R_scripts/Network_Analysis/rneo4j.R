@@ -20,8 +20,8 @@ Order by label[0]
 edges_query="MATCH (n:Drug)-[r:TARGETS_GENE]->(m:Gene) RETURN ID(n) AS source, ID(m) AS target"
 
 #Returns number of connections each drug node has
-drug_connection_count = "MATCH (n:Drug)-[r]->(g:Gene) return n AS drug, count(r) AS connection_count"
-
+drug_gene_connection_count = "MATCH (n:Drug)-[r]->(g:Gene) 
+return n.name AS drug, count(r) AS connection_count ORDER BY -connection_count"
 
 print("Finding Nodes...")
 nodes = cypher(neo4j, nodes_query)
@@ -33,6 +33,11 @@ library(igraph)
 #create igraph object
 ig = graph.data.frame(edges, directed=TRUE, nodes)
 
+#http://www.inside-r.org/packages/cran/igraph/docs/transitivity
+cc = transitivity(ig, vids=NULL, type="local")
+
+print("Calculating Clustering Coefficients...")
+print(cc)
 #Run Girvan-Newman clustering algorithm
 print("Running Girvan Newman betweenness algorithm")
 communities = edge.betweenness.community(ig)
@@ -57,3 +62,5 @@ sink(file = 'pc.json')
 cat(all_json)
 sink()
 
+
+modifiers = cypher.execute(neo4j, "MATCH (d:Drug)-[r:TARGETS_GENE]->(g:Gene {entity_class:"modifier"}) return d.name AS drug_name, g.symbol AS gene_name")
