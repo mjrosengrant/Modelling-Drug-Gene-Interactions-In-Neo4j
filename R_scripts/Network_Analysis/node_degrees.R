@@ -1,4 +1,5 @@
 library(RNeo4j)
+library(ggplot2)
 neo4j = startGraph("http://localhost:7474/db/data")
 
 drug_degree_query = "MATCH (d:Drug)-[r]->() 
@@ -35,32 +36,5 @@ End as name,
 LABELS(n) AS label,
 COUNT(r) AS degree ORDER BY -degree"
 allnodes_degrees = cypher(neo4j,allnodes_degree_query)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
