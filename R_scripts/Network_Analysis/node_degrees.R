@@ -7,7 +7,7 @@ RETURN d.name AS drug, count(r) AS degree ORDER BY -degree"
 drug_degrees = cypher(neo4j, drug_degree_query)
 
 drugToGene_degree_query = "MATCH (d:Drug)-[r]->(g:Gene) 
-RETURN g.symbol AS gene, count(r) AS DrugsThatTargetGene ORDER BY -DrugsThatTargetGene"
+RETURN d.name AS drug, count(r) AS degree ORDER BY -degree"
 drugToGene_degrees = cypher(neo4j, drugToGene_degree_query)
 
 gene_degree_query = "MATCH (g:Gene)-[r]-() 
