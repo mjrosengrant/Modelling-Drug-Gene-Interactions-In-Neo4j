@@ -109,9 +109,9 @@ def main():
     authenticate("localhost:7474", "neo4j", "qwerty1")
     graph = Graph()
     
-    #createDrugs(graph,data)
-    #createGenes(graph,data)
-    #createAberrations(graph,data)
+    createDrugs(graph,data)
+    createGenes(graph,data)
+    createAberrations(graph,data)
     createRuleNodes(graph,data)
 
 main()

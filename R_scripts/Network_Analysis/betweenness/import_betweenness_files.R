@@ -4,7 +4,6 @@ library(gdata)
 allnodes_betweenness = read.table("./pc2_allnodes_betweenness.csv",header = TRUE,sep=",")
 hist(allnodes_betweenness$betweenness)
 
-
 biomarker_betweenness = read.table("./pc2_biomarker_betweenness.csv",header = TRUE,sep=",")
 hist(biomarker_betweenness$betweenness)
 

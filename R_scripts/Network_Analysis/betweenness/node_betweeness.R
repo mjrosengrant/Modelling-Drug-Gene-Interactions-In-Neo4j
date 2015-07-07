@@ -43,8 +43,12 @@ print("Calculating Betweenness...")
 all_results = betweenness(ig,directed= TRUE)
 all_results_df <- ldply(all_results,data.frame)
 colnames(all_results_df) <- c("node_name", "betweenness")
+
+
+#This file contains betweenness of all nodes
+#To get each class of node's betweenness, load this into the betweeness python script
+#to split into separate CSVs for drugs,biomarkers, etc. 
 write.csv(x= all_nodes ,file="pc2_allnodes_list.csv")
-#############################
 
 
 p <- ggplot(all_results_df, aes(betweenness)) + stat_ecdf()
