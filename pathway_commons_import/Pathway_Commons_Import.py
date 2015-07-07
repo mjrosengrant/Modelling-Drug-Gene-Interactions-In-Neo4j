@@ -1,6 +1,11 @@
 
 # coding: utf-8
 
+# In[ ]:
+
+
+
+
 import pandas as pd 
 import numpy as np
 from py2neo import Graph, Node, Relationship, authenticate
@@ -38,7 +43,7 @@ def createAllGenes(graph,data):
         if geneName in entrezDict:
             entrez = str(entrezDict[geneName])
             
-        query = "MERGE (g:Gene {{symbol:\"{0}\", entrez:\"{1}\"}} )".format( geneName, entrez)
+        query = "MERGE (g:Gene {{name:\"{0}\", entrez:\"{1}\"}} )".format( geneName, entrez)
         
         currentIsGene = isGene(geneName)
         if currentIsGene is True:
@@ -60,7 +65,7 @@ def createRelationships(graph,data):
 
 
         #Query looks for genes in graph, and creates a unique relationship between them. 
-        query ="Match (ga:Gene {{symbol:\"{0}\" }}),(gb:Gene {{symbol:\"{1}\" }}) CREATE UNIQUE (ga)-[:{2} {{source:'Pathway Commons',data_source:\"{3}\", pubmed_id:\"{4}\", pathway_names:\"{5}\"}}]->(gb)".format(
+        query ="Match (ga:Gene {{name:\"{0}\" }}),(gb:Gene {{name:\"{1}\" }}) CREATE UNIQUE (ga)-[:{2} {{source:'Pathway Commons',data_source:\"{3}\", pubmed_id:\"{4}\", pathway_names:\"{5}\"}}]->(gb)".format(
             data["PARTICIPANT_A"][i],
             data["PARTICIPANT_B"][i], 
             data["INTERACTION_TYPE"][i].upper().replace("-","_"),
@@ -88,6 +93,12 @@ def main():
 
 main()
 
+
+
+
+
+
+# In[ ]:
 
 
 
