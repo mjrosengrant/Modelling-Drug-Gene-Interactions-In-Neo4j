@@ -30,9 +30,9 @@ def createGenes(graph,data):
             print"Error in getting genes"
             break
         query = (
-            "MATCH (d:Drug {{ name:'{2}'}})"
-            "MERGE (g:Gene {{ name:'{0}', entrez:'{1}'}})"
-            "CREATE UNIQUE (d)-[:TARGETS]->(g)"
+            "MATCH (d:Drug {{ name:'{2}'}}) "
+            "MERGE (g:Gene {{ name:'{0}', entrez:'{1}'}}) "
+            "CREATE UNIQUE (d)-[:TARGETS]->(g) "
         ).format(gene_name, gene_entrez, row["drug"])
         print query
         graph.cypher.execute(query)
@@ -59,10 +59,11 @@ def createAberrations(graph,data):
             print"Error in createAberrations()"
             break
             
-        query = ("MATCH (g:Gene {{name:'{0}', entrez:'{1}'}}) "
+        query = ("MATCH (g:Gene {{name:'{0}', entrez:'{1}'}}), (d:Drug {{name:'{6}'}}) "
                 "MERGE (a:Aberration {{ type:'{2}', value:'{3}', gene_entrez:'{4}', entity_class:'{5}' }}) "
-                "CREATE UNIQUE (a)<-[:HAS_ABERRATION]-(g)"
-                ).format(gene_name, gene_entrez, ab_type, ab_value, gene_entrez, row["entity_class"])
+                "CREATE UNIQUE (g)-[:HAS_ABERRATION]->(a) "
+                "CREATE UNIQUE (d)-[:TARGETS]->(a)"
+                ).format(gene_name, gene_entrez, ab_type, ab_value, gene_entrez, row["entity_class"], row["drug"])
         print query
         graph.cypher.execute(query)
     
@@ -87,7 +88,6 @@ def createRuleNodes(graph,data):
         else:
             print"Error in createAberrations()"
             break
-            
         query = ("MATCH (g:Gene {{name:'{0}', entrez:'{1}'}}), "
                  "(a:Aberration {{ type:'{2}', value:'{3}', gene_entrez:'{4}', entity_class:'{5}' }}), "
                  "(d:Drug {{name:'{6}'}} ) "
@@ -99,22 +99,24 @@ def createRuleNodes(graph,data):
                          row["drug"], row_index, row["Evidence"], row["PMID"], row["Evidence Text"])
         print query
         graph.cypher.execute(query)
-    
-   
-        
+
 def main():
     print "Starting Main Function"
-    data = pd.read_csv('./DrugRulesFixed.csv')
+    data = pd.read_csv('./drug_rulebase_import/DrugRulesFixed.csv')
 
     authenticate("localhost:7474", "neo4j", "qwerty1")
     graph = Graph()
     
-    createDrugs(graph,data)
-    createGenes(graph,data)
+    #createDrugs(graph,data)
+    #createGenes(graph,data)
     createAberrations(graph,data)
     createRuleNodes(graph,data)
-
 main()
+
+
+# In[ ]:
+
+
 
 
 # In[ ]:
