@@ -6,5 +6,4 @@ p <- ggplot(allnodes_betweenness, aes(betweenness, color="All Nodes", label = "A
 #p <- p + stat_ecdf(data=gene_betweenness, aes(betweenness, color="Genes"))
 #p <- p + stat_ecdf(data=drug_betweenness, aes(betweenness, color="Drugs"))
 #p <- p + stat_ecdf(data=biomarker_betweenness, aes(betweenness, color="Biomarkers"))
-
 print(p)
