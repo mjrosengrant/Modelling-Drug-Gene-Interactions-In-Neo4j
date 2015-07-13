@@ -3,3 +3,6 @@ pathway_commons_import/pc_data/*
 *.csv
 *.history
 .Rproj.user
+
+*.Rproj
+*.Rbuildignore
