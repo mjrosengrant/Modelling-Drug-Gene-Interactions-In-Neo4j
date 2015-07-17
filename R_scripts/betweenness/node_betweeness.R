@@ -21,7 +21,7 @@ betweenness_results = betweenness(full_ig,directed= TRUE, normalized = TRUE)
 #This file contains betweenness of all nodes
 #To get each class of node's betweenness, load this into the betweeness python script
 #to split into separate CSVs for drugs,biomarkers, etc. 
-write.csv(x= betweenness_results ,file="pc2_betweenness_list.csv")
+write.csv(x= betweenness_results ,file="pc2_druggene_betweenness.csv")
 
 
 

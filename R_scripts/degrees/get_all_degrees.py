@@ -28,16 +28,24 @@ def main():
 		"WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'modifier'} ) ) "
 		"RETURN DISTINCT ID(n) as id, n.name as name order by name"
    		)
+
+    biomarker_query = "MATCH (n:Gene {entity_class:'biomarker'}) RETURN DISTINCT ID(n) as id, n.name as name order by name"
+    
     #Run second query to get list of all modifier IDs
     modifier_query = (
 		"MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'modifier'}) " 
 		"WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'biomarker'} ) ) "
 		"RETURN DISTINCT ID(n) as id, n.name as name order by name"
    		)
+    modifier_query = "MATCH (n:Gene {entity_class:'modifier'}) RETURN DISTINCT ID(n) as id, n.name as name order by name"
+
     bio_mod_query = (
         "MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'modifier'}) " 
         "WHERE ( (n)-[:HAS_ABERRATION]->({entity_class:'biomarker'} ) ) "
         "RETURN DISTINCT ID(n) as id, n.name as name order by name"
+        )
+    bio_mod_query = ("MATCH (n:Gene {entity_class:'modifier'}) RETURN DISTINCT ID(n) as id, n.name as name order by name "
+        "UNION MATCH (n:Gene {entity_class:'biomarker'}) RETURN DISTINCT ID(n) as id, n.name as name order by name "
         )
 
     drug_query = "MATCH (d:Drug) RETURN DISTINCT ID(d) as id, d.name as name order by name"
@@ -56,13 +64,13 @@ def main():
 
     #Make http request to neo4j to get degree for each.
     print "Writing to Files..."
-    writeFile("pc2_biomarker_degrees.csv",biomarkers,graph)
-    writeFile("pc2_modifier_degrees.csv",modifiers,graph)
-    writeFile("pc2_bio_mod_degrees.csv",bio_mods,graph)
-    writeFile("pc2_drug_degrees.csv",drugs,graph)
-    writeFile("pc2_gene_degrees.csv",genes,graph)
-    writeFile("pc2_allnode_degrees.csv",allNodes,graph)
-    writeFile("pc2_aberration_degrees.csv",aberrations,graph)
+    writeFile("pc2_druggene_biomarker_degrees.csv",biomarkers,graph)
+    writeFile("pc2_druggene_modifier_degrees.csv",modifiers,graph)
+    #writeFile("pc2_druggene_bio_mod_degrees.csv",bio_mods,graph)
+    writeFile("pc2_druggene_drug_degrees.csv",drugs,graph)
+    writeFile("pc2_druggene_gene_degrees.csv",genes,graph)
+    writeFile("pc2_druggene_allnode_degrees.csv",allNodes,graph)
+    #writeFile("pc2_aberration_degrees.csv",aberrations,graph)
 
     print "Done"
 

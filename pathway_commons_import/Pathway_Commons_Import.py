@@ -63,7 +63,6 @@ def createRelationships(graph,data):
             print "Row {0} is a molecule interaction. Skipping".format(i)
             continue
 
-
         #Query looks for genes in graph, and creates a unique relationship between them. 
         query ="Match (ga:Gene {{name:\"{0}\" }}),(gb:Gene {{name:\"{1}\" }}) CREATE UNIQUE (ga)-[:{2} {{source:'Pathway Commons',data_source:\"{3}\", pubmed_id:\"{4}\", pathway_names:\"{5}\"}}]->(gb)".format(
             data["PARTICIPANT_A"][i],

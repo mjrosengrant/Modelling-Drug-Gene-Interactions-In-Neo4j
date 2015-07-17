@@ -31,9 +31,9 @@ def createGenes(graph,data):
             break
         query = (
             "MATCH (d:Drug {{ name:'{2}'}}) "
-            "MERGE (g:Gene {{ name:'{0}', entrez:'{1}'}}) "
+            "MERGE (g:Gene {{ name:'{0}', entrez:'{1}', entity_class:'{3}'}}) "
             "CREATE UNIQUE (d)-[:TARGETS]->(g) "
-        ).format(gene_name, gene_entrez, row["drug"])
+        ).format(gene_name, gene_entrez, row["drug"], row["entity_class"])
         print query
         graph.cypher.execute(query)
 
@@ -102,15 +102,15 @@ def createRuleNodes(graph,data):
 
 def main():
     print "Starting Main Function"
-    data = pd.read_csv('./drug_rulebase_import/DrugRulesFixed.csv')
+    data = pd.read_csv('DrugRulesFixed.csv')
 
     authenticate("localhost:7474", "neo4j", "qwerty1")
     graph = Graph()
     
-    #createDrugs(graph,data)
-    #createGenes(graph,data)
-    createAberrations(graph,data)
-    createRuleNodes(graph,data)
+    createDrugs(graph,data)
+    createGenes(graph,data)
+    #createAberrations(graph,data)
+    #createRuleNodes(graph,data)
 main()
 
 
