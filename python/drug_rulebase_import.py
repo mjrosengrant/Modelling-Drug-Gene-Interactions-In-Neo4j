@@ -1,7 +1,4 @@
-
-# coding: utf-8
-
-# In[ ]:
+#Reads in Drug Target Rulebase CSV file and converts it into a Neo4j graph
 
 import pandas as pd 
 import numpy as np
@@ -112,11 +109,6 @@ def main():
     #createAberrations(graph,data)
     #createRuleNodes(graph,data)
 main()
-
-
-# In[ ]:
-
-
 
 
 # In[ ]:
