@@ -2,6 +2,8 @@ library(RNeo4j)
 library(ggplot2)
 neo4j = startGraph("http://localhost:7474/db/data")
 
+#Imports CSVs containing Degree Information for each node class
+
 drug_degrees = read.table("node_info/pc2_druggene/pc2_druggene_drug_degrees.csv",header=TRUE, sep=",")
 drug_hist = hist(drug_degrees$degree)
 

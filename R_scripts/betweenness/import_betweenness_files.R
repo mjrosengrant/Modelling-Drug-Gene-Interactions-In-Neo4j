@@ -1,6 +1,6 @@
+#Imports CSV Files containing betweenness data for each category of Node
 
 library(gdata)
-
 allnodes_betweenness = read.table("node_info/pc2_druggene/pc2_druggene_allnode_info.csv",header = TRUE,sep=",")
 hist(allnodes_betweenness$betweenness)
 
@@ -17,7 +17,7 @@ drug_betweenness = read.table("node_info/pc2_druggene/pc2_druggene_drug_betweenn
 hist(drug_betweenness$betweenness)
 
 library(ggplot2)
-#Plots CDF of all node classifications
+#Plots CDF of betweenness values for all node classifications
 p <- ggplot()
 p <- p + stat_ecdf(data=gene_betweenness, aes(betweenness, color="Genes"))
 p <- p + stat_ecdf(data=drug_betweenness, aes(betweenness, color="Drugs"))
@@ -28,6 +28,7 @@ p <- p + ylab("Probability Density")
 p <- p + xlab("Betweenness")
 print(p)
 
+#Compares modifier and biomarker CDFs to the CDF of all genes using a Kolmogorov–Smirnov test
 ks.test(gene_betweenness$betweenness, modifier_betweenness$betweenness)
 ks.test(gene_betweenness$betweenness, biomarker_betweenness$betweenness)
 ks.test(biomarker_betweenness$betweenness, modifier_betweenness$betweenness)
