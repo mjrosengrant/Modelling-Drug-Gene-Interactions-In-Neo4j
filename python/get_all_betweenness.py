@@ -3,11 +3,7 @@ import numpy as np
 import pandas as pd
 from py2neo import Graph, Node, Relationship, authenticate
 
-def loadBetweennessData():
-    return pd.read_csv('pc2_druggene_allnode_info.csv')
-
-
-
+# 
 def writeFile(filename, nodeList, graph, bDict):
     with open(filename, 'a') as f:
         writer = csv.writer(f)            
@@ -65,18 +61,19 @@ def main():
 
     #Load betweenness data and create Dictionary matching id to betweenness value
     nodeData = pd.read_csv('/Users/mrosengrant/Desktop/codebase/R_scripts/node_info/pc2_druggene/pc2_druggene_allnode_info.csv')
+    
+    # bdict maps a node id as an index to its betweenness value, for easy access in the writeFile function.
     bdict = dict(zip(nodeData["id"], nodeData["betweenness"]))
-    print (bdict[2566])
 
     #Make http request to neo4j to get degree for each.
     print "Writing to Files..."
     writeFile("pc2_druggene_biomarker_betweenness.csv",biomarkers,graph,bdict)
-    #writeFile("pc2_druggene_modifier_betweenness.csv",modifiers,graph,bdict)
-    #writeFile("pc2_druggene_bio_mod_degrees.csv",bio_mods,graph,bdict)
-    #writeFile("pc2_druggene_drug_betweenness.csv",drugs,graph,bdict)
-    #writeFile("pc2_druggene_gene_betweenness.csv",genes,graph,bdict)
-    #writeFile("pc2_druggene_allnode_betweenness.csv",allNodes,graph,bdict)
-    ##writeFile("pc2_aberration_degrees.csv",aberrations,graph,bdict)
+    writeFile("pc2_druggene_modifier_betweenness.csv",modifiers,graph,bdict)
+    writeFile("pc2_druggene_bio_mod_degrees.csv",bio_mods,graph,bdict)
+    writeFile("pc2_druggene_drug_betweenness.csv",drugs,graph,bdict)
+    writeFile("pc2_druggene_gene_betweenness.csv",genes,graph,bdict)
+    writeFile("pc2_druggene_allnode_betweenness.csv",allNodes,graph,bdict)
+    #writeFile("pc2_aberration_degrees.csv",aberrations,graph,bdict)
 
     print "Done"
 
