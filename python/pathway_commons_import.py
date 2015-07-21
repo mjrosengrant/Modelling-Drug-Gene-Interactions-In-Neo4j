@@ -6,7 +6,8 @@ import pandas as pd
 import numpy as np
 from py2neo import Graph, Node, Relationship, authenticate
 
-
+# Checks whether a given entity name is a gene. Based on looking at the Excel sheet, I deduced that genes are always in all caps,
+# and do not have the word KNOWLEDGEBASE or semi colons in the name. These rules  were enough to filter out all the molecules and bodily chemicals in the Pathway Commons
 def isGene(potentialGene):
     if "KNOWLEDGEBASE" in str(potentialGene):
         return False
