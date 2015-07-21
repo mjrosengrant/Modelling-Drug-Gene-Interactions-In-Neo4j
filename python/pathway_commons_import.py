@@ -21,7 +21,7 @@ def isGene(potentialGene):
 
 #Reads in Homo_sapiens.txt and creates a dictionary mapping GeneSymbols to their Entrez values
 def createEntrezDict():
-    homo_sapiens = pd.read_csv('./pc_data/Homo_sapiens.txt',sep="\t")
+    homo_sapiens = pd.read_csv('node_info/pc_data/Homo_sapiens.txt',sep="\t")
     dictionary = pd.Series(homo_sapiens.GeneID.values, index=homo_sapiens.Symbol.values).to_dict()
     return dictionary
 
@@ -79,7 +79,7 @@ def createRelationships(graph,data):
 
 def main():
     print "Starting Main Function"
-    data = pd.read_csv('./pc_data/PC.Reactome.EXTENDED_BINARY_SIF.hgnc.csv')
+    data = pd.read_csv('node_info/pc_data/PC.Reactome.EXTENDED_BINARY_SIF.hgnc.csv')
 
     authenticate("localhost:7474", "neo4j", "qwerty1")
     graph = Graph()

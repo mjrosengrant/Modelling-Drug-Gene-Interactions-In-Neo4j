@@ -4,7 +4,7 @@ import pandas as pd
 from py2neo import Graph, Node, Relationship, authenticate
 
 def loadBetweennessData():
-    return pd.read_csv('pc2_druggene_allnode_info.csv')
+    return pd.read_csv('node_info/pc2_druggene_allnode_info.csv')
 
 
 
@@ -64,7 +64,7 @@ def main():
     aberrations = graph.cypher.execute( aberration_query )
 
     #Load betweenness data and create Dictionary matching id to betweenness value
-    nodeData = pd.read_csv('/Users/mrosengrant/Desktop/codebase/R_scripts/node_info/pc2_druggene/pc2_druggene_allnode_info.csv')
+    nodeData = loadBetweennessData()
     bdict = dict(zip(nodeData["id"], nodeData["betweenness"]))
     print (bdict[2566])
 

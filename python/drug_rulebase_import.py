@@ -99,7 +99,7 @@ def createRuleNodes(graph,data):
 
 def main():
     print "Starting Main Function"
-    data = pd.read_csv('DrugRulesFixed.csv')
+    data = pd.read_csv('node_info/DrugRulesFixed.csv')
 
     authenticate("localhost:7474", "neo4j", "qwerty1")
     graph = Graph()

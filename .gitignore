@@ -6,3 +6,6 @@ pathway_commons_import/pc_data/*
 
 *.Rproj
 *.Rbuildignore
+
+.RData
+.Rhistory

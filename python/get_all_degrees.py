@@ -6,15 +6,19 @@ import urllib2
 def writeFile(filename, nodeList, graph):
     with open(filename, 'a') as f:
         writer = csv.writer(f)            
-        header = [ "id", "name", "degree" ]
+        header = [ "id", "name", "degree_in", "degree_out", "degree_all" ]
         writer.writerows([header])
         for row in nodeList:
             is_part_of_rels =  graph.cypher.execute("MATCH (n)-[r:IS_PART_OF]->(rule:Rule) WHERE ID(n)={0} RETURN COUNT(r)".format(row["id"]) )
 
             #For accurate results, you need to subtract the [:IS_PART_OF] relationships from the degree total, since those are specific to our rulebase,
-            #and don't provide any useful biological information
-            row_degree = int (urllib2.urlopen("http://localhost:7474/db/data/node/{0}/degree/all".format(row["id"]) ).read()) - int(is_part_of_rels[0][0])
-            new_row = [ row["id"], row["name"], row_degree ]
+            #and don't provide any useful biological information. Only necessary for versions of the graph where there are Rule Nodes
+            row_degree_all = int (urllib2.urlopen("http://localhost:7474/db/data/node/{0}/degree/all".format(row["id"]) ).read()) 
+            row_degree_in = int (urllib2.urlopen("http://localhost:7474/db/data/node/{0}/degree/in".format(row["id"]) ).read()) 
+            row_degree_out = int (urllib2.urlopen("http://localhost:7474/db/data/node/{0}/degree/out".format(row["id"]) ).read()) - int(is_part_of_rels[0][0])
+
+
+            new_row = [ row["id"], row["name"], row_degree_in, row_degree_out, row_degree_all ]
             writer.writerows([new_row])
 
 def main():
@@ -24,19 +28,19 @@ def main():
     
     #Run query to get list of all biomarker IDs
     biomarker_query = (
-		"MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'biomarker'}) " 
-		"WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'modifier'} ) ) "
-		"RETURN DISTINCT ID(n) as id, n.name as name order by name"
-   		)
+        "MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'biomarker'}) " 
+        "WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'modifier'} ) ) "
+        "RETURN DISTINCT ID(n) as id, n.name as name order by name"
+        )
 
     biomarker_query = "MATCH (n:Gene {entity_class:'biomarker'}) RETURN DISTINCT ID(n) as id, n.name as name order by name"
     
     #Run second query to get list of all modifier IDs
     modifier_query = (
-		"MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'modifier'}) " 
-		"WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'biomarker'} ) ) "
-		"RETURN DISTINCT ID(n) as id, n.name as name order by name"
-   		)
+        "MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'modifier'}) " 
+        "WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'biomarker'} ) ) "
+        "RETURN DISTINCT ID(n) as id, n.name as name order by name"
+        )
     modifier_query = "MATCH (n:Gene {entity_class:'modifier'}) RETURN DISTINCT ID(n) as id, n.name as name order by name"
 
     bio_mod_query = (

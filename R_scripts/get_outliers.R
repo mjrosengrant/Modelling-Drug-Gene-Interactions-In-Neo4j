@@ -1,7 +1,7 @@
 library(extremevalues)
-node_data <- read.table("~/Desktop/codebase/R_scripts/node_info/pc2_druggene_info.csv",header=TRUE, sep=",")
+node_data <- read.table("node_info/pc2_druggene_info.csv",header=TRUE, sep=",")
 
-#Returns List of outliers from 
+#Returns List of outliers from dataframe x
 discretize_ccle <- function(x, FLim = c(y,z)) {
   x_na_rm <- x[!is.na(x)]
   # x_na_rm <- x
