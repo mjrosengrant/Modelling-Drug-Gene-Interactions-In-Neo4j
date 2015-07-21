@@ -2,6 +2,9 @@ import csv
 import numpy as np
 from py2neo import Graph, Node, Relationship, authenticate
 import urllib2
+# This script queries the Neo4j database to get a node list of each classification, and then runs a separate function to 
+# use the Neo4j REST API  to get the degree of each node. The function then writes the results to a CSV.
+
 
 def writeFile(filename, nodeList, graph):
     with open(filename, 'a') as f:
@@ -18,20 +21,19 @@ def writeFile(filename, nodeList, graph):
             writer.writerows([new_row])
 
 def main():
-    #Export results to CSV file
+    # Connect to Neo4j instance
     authenticate("localhost:7474", "neo4j", "qwerty1")
     graph = Graph()
     
-    #Run query to get list of all biomarker IDs
+    #Set up query to get list of all nodes by classification
     biomarker_query = (
 		"MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'biomarker'}) " 
 		"WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'modifier'} ) ) "
 		"RETURN DISTINCT ID(n) as id, n.name as name order by name"
    		)
 
+ 
     biomarker_query = "MATCH (n:Gene {entity_class:'biomarker'}) RETURN DISTINCT ID(n) as id, n.name as name order by name"
-    
-    #Run second query to get list of all modifier IDs
     modifier_query = (
 		"MATCH (n:Gene)-[:HAS_ABERRATION]->(a:Aberration {entity_class:'modifier'}) " 
 		"WHERE NOT( (n)-[:HAS_ABERRATION]->({entity_class:'biomarker'} ) ) "
