@@ -1,0 +1,17 @@
+//Give me all rules that have gene NRAS with Q61R aberration.
+MATCH (r:Rule)<-[:IS_PART_OF]-(g:Gene {name:"NRAS"})-[:HAS_ABERRATION]->(a:Aberration {value:"Q61R"}) return r
+
+//How many rules are there for drug dasatinib
+MATCH (r:Rule)<-[:IS_PART_OF]-(d:Drug {name:"dasatinib"}) return count(r)
+
+//Find me all rules that have a ‘no’ indication for drug temozolomide.
+MATCH (r:Rule {indication:"NO"})<-[:IS_PART_OF]-(d:Drug {name:"temozolomide"}) return count(r)
+
+//Return all rules that contain the gene ERBB2 that has a aberration of CNV gain.
+MATCH (r:Rule)<-[:IS_PART_OF]-(g:Gene {name:"ERBB2"})-[:HAS_ABERRATION]->(a:Aberration {type:"cnv",value:"gain"}) return r
+
+//Count how many rules have aberration of CNV gain and a rule indication of ‘yes’
+MATCH (r:Rule {indication:"yes"})<-[:IS_PART_OF]-(d:Drug {name:"dasatinib"}) return count(r)
+
+//What genes and aberrations are targeted by dasatinib
+MATCH (d:Drug {name:"dasatinib"})-[r1:TARGETS]->(a:Aberration)<-[r2:HAS_ABERRATION]-(g:Gene) return r1,r2

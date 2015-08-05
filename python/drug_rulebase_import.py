@@ -26,11 +26,24 @@ def createGenes(graph,data):
         else:
             print"Error in getting genes"
             break
+        
+
+        #Query for complete graphs. Doesn't add entity_class to Gene Nodes (stored in aberration instead)
         query = (
             "MATCH (d:Drug {{ name:'{2}'}}) "
-            "MERGE (g:Gene {{ name:'{0}', entrez:'{1}', entity_class:'{3}'}}) "
+            "MERGE (g:Gene {{ name:'{0}', entrez:'{1}'}}) "
             "CREATE UNIQUE (d)-[:TARGETS]->(g) "
-        ).format(gene_name, gene_entrez, row["drug"], row["entity_class"])
+        ).format(gene_name, gene_entrez, row["drug"])
+
+        
+        # Query for druggene graphs. Adds entity_class attribute to the gene Node
+        #query = (
+            #"MATCH (d:Drug {{ name:'{2}'}}) "
+            #"MERGE (g:Gene {{ name:'{0}', entrez:'{1}', entity_class:'{3}'}}) "
+            #"CREATE UNIQUE (d)-[:TARGETS]->(g) "
+        #).format(gene_name, gene_entrez, row["drug"], row["entity_class"])
+
+
         print query
         graph.cypher.execute(query)
 
@@ -55,7 +68,7 @@ def createAberrations(graph,data):
         else:
             print"Error in createAberrations()"
             break
-            
+
         query = ("MATCH (g:Gene {{name:'{0}', entrez:'{1}'}}), (d:Drug {{name:'{6}'}}) "
                 "MERGE (a:Aberration {{ type:'{2}', value:'{3}', gene_entrez:'{4}', entity_class:'{5}' }}) "
                 "CREATE UNIQUE (g)-[:HAS_ABERRATION]->(a) "
@@ -106,8 +119,11 @@ def main():
     
     createDrugs(graph,data)
     createGenes(graph,data)
-    #createAberrations(graph,data)
-    #createRuleNodes(graph,data)
+    
+    # If building druggene version of graph, comment out createAberrations() and createRuleNodes()
+    # Also don't forget to check that the correct query inside createGenes() is uncommented
+    createAberrations(graph,data)
+    createRuleNodes(graph,data)
 main()
 
 
