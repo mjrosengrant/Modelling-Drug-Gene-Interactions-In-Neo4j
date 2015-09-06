@@ -1,8 +1,7 @@
-/data/*
+pathway_commons_import/pc_data/*
 *.tsv
 *.csv
-*.history
-.Rproj.user
+*.
 
 *.Rproj
 *.Rbuildignore

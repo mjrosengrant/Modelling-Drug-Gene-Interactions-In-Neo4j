@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 from py2neo import Graph, Node, Relationship, authenticate
 
+from pymongo import MongoClient
+
 # Checks whether a given entity name is a gene. Based on looking at the Excel sheet, I deduced that genes are always in all caps,
 # and do not have the word KNOWLEDGEBASE or semi colons in the name. These rules  were enough to filter out all the molecules and bodily chemicals in the Pathway Commons
 def isGene(potentialGene):
@@ -19,36 +21,32 @@ def isGene(potentialGene):
         return True
     else:
         return False
-
 #Reads in Homo_sapiens.txt and creates a dictionary mapping GeneSymbols to their Entrez values
 def createEntrezDict():
     homo_sapiens = pd.read_csv('node_info/pc_data/Homo_sapiens.txt',sep="\t")
     dictionary = pd.Series(homo_sapiens.GeneID.values, index=homo_sapiens.Symbol.values).to_dict()
     return dictionary
 
-
 def createAllGenes(graph,data):
     #Create Dictionary that takes gene symbol as input and return entrez value
-    entrezDict = createEntrezDict()
+    #entrezDict = createEntrezDict()
 
-    uniqueGenes = np.unique(data[["PARTICIPANT_A","PARTICIPANT_B"]])
-    for i in range(uniqueGenes.size):
-        
-        geneName = str(uniqueGenes[i])
-        entrez = ""
-        
-        if geneName in entrezDict:
-            entrez = str(entrezDict[geneName])
-            
-        query = "MERGE (g:Gene {{name:\"{0}\", entrez:\"{1}\"}} )".format( geneName, entrez)
-        
-        currentIsGene = isGene(geneName)
-        if currentIsGene is True:
-            print query +"\n"            
-            graph.cypher.execute(query)
-        else:
-            print geneName + " is not a gene. Skipping"               
+    #uniqueGenes = np.unique(data[['PARTICIPANT_A','PARTICIPANT_B']])        
+    uniqueGenesA = np.unique(data["PARTICIPANT_A"])
+    uniqueGenesB = np.unique(data["PARTICIPANT_B"])
 
+    #print str(uniqueGenes.size) + "Unique Genes Found"
+    print "uniqueGenesA.size = " + str(uniqueGenesA.size)
+    print "uniqueGenesB.size = " + str(uniqueGenesB.size)
+    #print "uniqueGene.size = " + str(uniqueGenes.size)
+
+
+    #graph.nodes.ensureIndex({"name":1},{"unique":"true"});
+    
+    for i in range(uniqueGenesA.size):
+        print uniqueGenesA[i] + "\n"
+        graph.nodes.insert_one({"name": str(uniqueGenesA[i])} )
+        
 
 def createRelationships(graph,data):
     
@@ -80,12 +78,36 @@ def createRelationships(graph,data):
 
 def main():
     print "Starting Main Function"
-    data = pd.read_csv('node_info/pc_data/PC.Reactome.EXTENDED_BINARY_SIF.hgnc.csv')
+    data = pd.read_csv('data/pc_data_extended.csv')
+    #data = pd.read_csv('data/PathwayCommons.7.Reactome.EXTENDED_BINARY_SIF.csv',sep=",")
 
-    authenticate("localhost:7474", "neo4j", "qwerty1")
-    graph = Graph()
+    print data.shape
+    client = MongoClient()
+    graph = client.hypergraph
 
     createAllGenes(graph,data)
-    createRelationships(graph,data)
+    #createRelationships(graph,data)
+
+
+def neo4j_authenticate():
+    authenticate("localhost:7474", "neo4j", "qwerty1")
+    graph = Graph()
+def neo4j_createAllGenes(uniqueGenes,entrezDict):
+    for i in range(uniqueGenes.size):
+        
+        geneName = str(uniqueGenes[i])
+        entrez = ""
+        
+        if geneName in entrezDict:
+            entrez = str(entrezDict[geneName])
+            
+        query = "MERGE (g:Gene {{name:\"{0}\", entrez:\"{1}\"}} )".format( geneName, entrez)
+        
+        currentIsGene = isGene(geneName)
+        if currentIsGene is True:
+            print query +"\n"            
+            graph.cypher.execute(query)
+        else:
+            print geneName + " is not a gene. Skipping"               
 
 main()
